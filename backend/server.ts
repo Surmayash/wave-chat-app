@@ -8,14 +8,18 @@ import CONFIG from './config';
 const app = express();
 const router = express.Router();
 
-const httpServer = http.createServer(http);
-const io = new IOServer(httpServer);
+router.get('/', (req, res) => {
+  res.send('Backend is running!');
+});
 
-app.use(router);
 app.use(cors({ origin: '*' }));
+app.use(router);
 
-io.on('connection', (socket) => {});
+const httpServer = http.createServer(app);
+const io = new IOServer(httpServer, { cors: { origin: '*' } });
+
+io.on('connection', (socket) => { });
 
 httpServer.listen(CONFIG.PORT, () => {
-  console.log(`Server listening on *:${CONFIG.PORT} 🚀`);
+  console.log(`Server listening on *:${CONFIG.PORT}`);
 });
