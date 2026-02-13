@@ -16,12 +16,14 @@ export default function Home({ socket }: { socket: Socket }) {
       navigate(`/chat/${connectionId}`);
     };
 
+    //user tries to join
     const handleError = (err: string) => {
       setLoading(false);
       setError(err);
       setTimeout(() => setError(''), 3000);
     };
 
+    //Backend send event
     socket.on('chat_start', handleChatStart);
     socket.on('error', handleError);
 
@@ -31,6 +33,7 @@ export default function Home({ socket }: { socket: Socket }) {
     };
   }, [socket, navigate, connectionId]);
 
+  //Join button clicked
   const handleJoin = () => {
     if (!connectionId.trim()) return;
     setLoading(true);

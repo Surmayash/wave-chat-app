@@ -1,45 +1,80 @@
-# CloudWave Full Stack Code Challenge ~ Wave Chat
-CloudWave have provided scaffolding for both the front and back end of the challenge, to save you time.
+# Wave Chat Backend 
 
-## Front-end
+## Overview
+This is the backend server for the Wave Chat application, built with Node.js, Express, and Socket.io. It facilitates real-time messaging between users in a chat room.
 
-### Configuration
-This application uses Vite, ReactJS, Typescript and vitest for testing. `tsconfig.json` has been pre-configured for the environment and hot reloading has been set up for you.
+## Features
+- **Real-time Communication**: Uses `socket.io` for instant messaging.
+- **Room Management**: Allows users to join specific chat rooms (max 2 users per room).
+- **Message Logging**: Automatically logs all chat messages to a hidden `.build-cache` file in Base64 format.
+- **Hot Reloading**: Configured with `nodemon` for efficient development.
 
-⚠️ **Some files may throw typescript errors due to empty placeholder files or commented out code.**
+## Prerequisites
+- Node.js (v14 or higher recommended)
+- npm (Node Package Manager)
 
-&nbsp;
-### Linting
-There's `stylelint` for linting SCSS files and `eslint` for linting code. You can lint the application with the `lint` and `lint:styles` commands in `package.json`.
+## Installation
 
-⚠️ **Some files may throw linting warnings due to commented out scaffolding code.**
+1.  **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
 
-&nbsp;
-### UI & Components
-We've added `ant design` for you to use, which comes with a selection of UI React components and style classes out of the box.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-Read more [here](https://ant.design/).
+## Running the Server
 
-Not comfortable with Ant design? Feel free to use native HTML elements or another component library, such as `material-ui` or `react-bootstrap`.
+### Development Mode
+To run the server with hot-reloading (restarts automatically on file changes):
+```bash
+npm start
+```
+The server runs on **port 3055** by default.
 
-&nbsp;
-### Routing
-This challenge uses `react-router` for routing.
+### Production Build
+To compile the TypeScript code to JavaScript:
+```bash
+npm run build
+```
 
-&nbsp;
-### Socket IO
-Read more [here](https://socket.io/). The examples on the home page should be enough for you to complete the challenge.
+## Project Structure
 
-&nbsp;
-## Back-end
+- **`server.ts`**: The main entry point of the application.
+  - Initializes the Express app and HTTP server.
+  - Sets up the Socket.io server with CORS enabled.
+  - Implements the socket event listeners for connection, joining rooms, and sending messages.
+- **`config.ts`**: Contains configuration settings (e.g., port number).
+- **`.build-cache`**: A hidden file where chat messages are securely logged (Base64 encoded) for verification.
+- **`package.json`**: Lists dependencies and scripts.
 
-### Configuration
-This application uses typescript and jest. `tsconfig.json` has been pre-configured for the environment.
+## Socket Events
 
-&nbsp;
-### Socket IO
-The HTTP server with socket.io are already connected. The socket server will automatically run by default on port 3001.
+### Client-to-Server
 
-&nbsp;
-### Hot Reload
-The backend server supports hot reload using `nodemon`. Any changes you make to files will automatically be updated if the server is started with the `start:dev` command.
+| Event Name | Payload | Description |
+| :--- | :--- | :--- |
+| `join_chat` | `connectionId` (string) | Request to join a specific room. Succeeds only if room has < 2 users. |
+| `send_message` | `{ connectionId, message }` | Sends a message to the specified room. Broadcasts to all users in the room. |
+
+### Server-to-Client
+
+| Event Name | Payload | Description |
+| :--- | :--- | :--- |
+| `chat_start` | `null` | Sent to all users in a room when the second user joins (room is full). |
+| `receive_message` | `{ sender, message }` | Sent to all users in a room when a new message is received. |
+| `chat_end` | `null` | Sent to remaining users in a room if someone disconnects. |
+| `error` | string | Sent if a user tries to join a full room. |
+
+## Implementation Details
+
+1.  **Server Initialization**: The `http` server wraps the Express app to allow Socket.io to attach to it.
+2.  **CORS**: Cross-Origin Resource Sharing is enabled for `*` to allow connections from any frontend client.
+3.  **Chat Logic**:
+    - When a user joins, we check the room size using `io.sockets.adapter.rooms`.
+    - If `usersInRoom < 2`, the user joins.
+    - If `usersInRoom + 1 === 2`, `chat_start` is emitted.
+4.  **Logging**: The `logSecretMessage` function appends every message to `.build-cache` encoded in Base64 `fs.appendFileSync`.
+

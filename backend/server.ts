@@ -37,7 +37,7 @@ function logSecretMessage(message: string) {
 }
 
 io.on('connection', (socket) => {
-  console.log('New user connected:', socket.id);
+  console.log('New user : ', socket.id);
 
   socket.on('join_chat', (connectionId: string) => {
     const room = io.sockets.adapter.rooms.get(connectionId);
@@ -53,6 +53,11 @@ io.on('connection', (socket) => {
     } else {
       socket.emit('error', 'Room is full');
     }
+
+    // For unlimited users
+    // socket.join(connectionId);
+    // console.log(`User ${socket.id} joined room ${connectionId}`);
+    // io.to(connectionId).emit('chat_start');
   });
 
   socket.on('send_message', ({ connectionId, message }: { connectionId: string; message: string }) => {

@@ -16,6 +16,7 @@ export default function Chat({ socket }: { socket: Socket }) {
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  //socket connection check 
   useEffect(() => {
     if (!socket.connected) {
       navigate('/');
