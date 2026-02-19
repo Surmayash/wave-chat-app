@@ -1,4 +1,5 @@
 # Wave Chat Backend 
+
 This is the backend server for the Wave Chat application, built with Node.js, Express, and Socket.io. It facilitates real-time messaging between users in a chat room.
 
 ## Features
